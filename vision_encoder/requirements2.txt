@@ -1,0 +1,3 @@
+pyyaml
+scikit-image
+tqdm

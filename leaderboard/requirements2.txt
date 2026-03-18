@@ -1,0 +1,5 @@
+dictor
+requests
+pygame
+tabulate
+easydict
