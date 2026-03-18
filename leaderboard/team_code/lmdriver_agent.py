@@ -20,7 +20,6 @@ from torchvision import transforms
 from leaderboard.autoagents import autonomous_agent
 from team_code.planner import RoutePlanner, InstructionPlanner
 from team_code.pid_controller import PIDController
-from timm.models import create_model
 from lavis.common.registry import registry
 
 try:
@@ -32,6 +31,10 @@ except ImportError:
 SAVE_PATH = os.environ.get("SAVE_PATH", 'eval')
 IMAGENET_DEFAULT_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_DEFAULT_STD = (0.229, 0.224, 0.225)
+
+
+def _load_checkpoint(path, map_location=None):
+    return torch.load(path, map_location=map_location, weights_only=False)
 
 def rotate_lidar(lidar, angle):
     radian = np.deg2rad(angle)
@@ -210,7 +213,10 @@ class LMDriveAgent(autonomous_agent.AutonomousAgent):
         self.net = model
 
         print('load model...')
-        self.net.load_state_dict(torch.load(self.config.lmdrive_ckpt)["model"], strict=False)
+        self.net.load_state_dict(
+            _load_checkpoint(self.config.lmdrive_ckpt, map_location=torch.device("cpu"))["model"],
+            strict=False,
+        )
         self.net.cuda()
         self.net.eval()
         self.softmax = torch.nn.Softmax(dim=1)

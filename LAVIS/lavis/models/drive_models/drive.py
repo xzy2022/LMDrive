@@ -15,7 +15,13 @@ from peft import LoraConfig, get_peft_model
 
 from lavis.common.registry import registry
 from lavis.models.blip2_models.blip2 import Blip2Base, disabled_train
-from timm import create_model
+from lavis.models.drive_models.visual_encoders import create_visual_encoder
+
+
+def _load_checkpoint(path, map_location=None):
+    # LMDrive checkpoints were produced before torch.load switched to
+    # weights_only=True by default in newer PyTorch releases.
+    return torch.load(path, map_location=map_location, weights_only=False)
 
 class LayerNorm(nn.LayerNorm):
     """Subclass torch's LayerNorm to handle fp16."""
@@ -80,10 +86,12 @@ class Blip2VicunaDrive(Blip2Base):
         self.split_section_num_for_visual_encoder = split_section_num_for_visual_encoder
 
 
-        self.visual_encoder = create_model(preception_model) #TODO with timm
+        self.visual_encoder = create_visual_encoder(preception_model)
         self.ln_vision = LayerNorm(self.visual_encoder.num_features)
         if load_pretrained:
-            pretrain_weights = torch.load(preception_model_ckpt, map_location=torch.device('cpu'))['state_dict']
+            pretrain_weights = _load_checkpoint(
+                preception_model_ckpt, map_location=torch.device("cpu")
+            )["state_dict"]
             self.visual_encoder.load_state_dict(pretrain_weights, strict=True)
 
         if freeze_vit:
