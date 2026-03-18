@@ -19,11 +19,11 @@ import abc
 import cv2
 import numpy as np
 import torch
+import torch.nn.functional as nnf
+from diffusers.models.attention import Attention
 from IPython.display import display
 from PIL import Image
-from diffusers.models.cross_attention import CrossAttention
 from typing import Union, Tuple, List, Dict, Optional
-import torch.nn.functional as nnf
 
 
 def text_under_image(image: np.ndarray, text: str, text_color: Tuple[int, int, int] = (0, 0, 0)) -> np.ndarray:
@@ -534,7 +534,7 @@ class P2PCrossAttnProcessor:
         self.controller = controller
         self.place_in_unet = place_in_unet
 
-    def __call__(self, attn: CrossAttention, hidden_states, encoder_hidden_states=None, attention_mask=None):
+    def __call__(self, attn: Attention, hidden_states, encoder_hidden_states=None, attention_mask=None):
         batch_size, sequence_length, _ = hidden_states.shape
         attention_mask = attn.prepare_attention_mask(attention_mask, sequence_length, batch_size=batch_size)
 

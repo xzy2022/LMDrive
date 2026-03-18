@@ -7,7 +7,7 @@
 import numpy as np
 import PIL
 import torch
-from diffusers.utils.pil_utils import PIL_INTERPOLATION
+from diffusers.utils import PIL_INTERPOLATION
 from PIL import Image
 
 from lavis.common.annotator.canny import CannyDetector
