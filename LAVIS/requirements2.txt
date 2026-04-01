@@ -16,7 +16,7 @@ pycocotools
 python-magic
 scikit-image
 sentencepiece
-spacy
+spacy<3.8
 streamlit
 tqdm
 webdataset
